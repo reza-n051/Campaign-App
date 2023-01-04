@@ -1,0 +1,57 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:dev.db"
+}
+
+model Karzar {
+  id           String       @id @default(uuid())
+  name         String
+  imgSrc       String
+  text         String
+  isAccepted   Boolean
+  isActive     Boolean
+  createTime   DateTime     @default(now())
+  acceptedTime DateTime?
+  creator      User         @relation(fields: [creatorId], references: [id])
+  creatorId    Int
+  sign         KarzarSign[]
+}
+
+model User {
+  id          Int          @id @default(autoincrement())
+  username    String       @unique
+  email       String       @unique
+  imgSrc      String
+  firstName   String
+  role        String       @default("USER")
+  lastName    String
+  phoneNumber String       @unique
+  password    String
+  karzars     Karzar[]
+  sign        KarzarSign[]
+}
+
+model UnknownUser {
+  id          Int          @id @default(autoincrement())
+  firstName   String
+  lastName    String
+  phoneNumber String       @unique
+  sign        KarzarSign[]
+}
+
+model KarzarSign {
+  id            Int          @id @default(autoincrement())
+  user          User?        @relation(fields: [userId], references: [id])
+  userId        Int?
+  unknownUser   UnknownUser? @relation(fields: [unknownUserId], references: [id])
+  unknownUserId Int?
+  karzar        Karzar       @relation(fields: [karzarId], references: [id])
+  karzarId      String
+}
